@@ -10,6 +10,9 @@ urls = [
         'http://www.google.com',
         'http://www.psf.org'
         ]
+bad_urls = [
+        'http://badurl.does/not/exist'
+        ]
 ############# tests ##############
 def test_get():
     global urls
@@ -155,6 +158,27 @@ class GrequestsCase(unittest.TestCase):
 
     def get(self, url, **kwargs):
         return grequests.map([grequests.get(url, **kwargs)])[0]
+
+    def test_map_badurl_exception_handler_class(self):
+        class ExceptionHandler:
+            def __init__(self):
+                self.counter = 0
+
+            def callback(self, request, exception):
+                 print exception
+                 self.counter += 1
+        eh = ExceptionHandler()
+        reqs = [grequests.get(url) for url in bad_urls]
+        list(grequests.map(reqs, exception_handler=eh.callback))
+        self.assertEqual(eh.counter, 1)
+
+    def test_map_badurl_exception_handler_method(self):
+        def exception_handler(request, exception):
+             print exception
+             self.assertIsNotNone(exception)
+        reqs = [grequests.get(url) for url in bad_urls]
+        list(grequests.map(reqs, exception_handler=exception_handler))
+
 
 
 if __name__ == '__main__':
