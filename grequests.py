@@ -56,6 +56,8 @@ class AsyncRequest(object):
         self.kwargs = kwargs
         #: Resulting ``Response``
         self.response = None
+        #: Exception
+        self.exception = None
 
     def send(self, **kwargs):
         """
